@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>SN Farm Controller</title>
+      <meta charset="UTF-8">
+      <title>Safarinow</title>
+      <meta name="SafariNow" content="WebDev">
+      <link href="test.css" rel="stylesheet" type="text/css" />
+   </head>
+   <body>
+      <div class="container">
+         <div id="header">
+                <div id="logo"><img src="safarinow.png"></div>
+            </div>
+         <!-- content area - where table is located -->
+         <div id="content_area">
+            <div id="stats">
+                    <button onclick="refreshStats()">Reload</button>
+                    <div id="server">
+                    <script type="text/javascript">
+                           //Refreshes the Server Stats table
+                        function refreshStats() {
+                            location.reload(true);
+                        }
+                        //Get Server list currently in farm and formulate a table.
+                        var data, txt = "";
+                            xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                     data = JSON.parse(this.responseText);
+                                     txt += "<table border='5'><th>Name</th><th>Status</th><th>Total Sessions</th><th>Enable</th><th>Disable</th> ";
+                                 for (var x in data.be_app.server) {
+                                      txt += "<tr><td>" + x+ "</td><td>" + data.be_app.server[x].status+ "</td><td>" + data.be_app.server[x].stot+ "</td><td><button attr-server='"+x+"' class='btUp'>Enable</button></td><td><button class='btDown' attr-server='"+x+"'>Disable</button></td></tr>" 
+                                 }      
+                                txt += "</table>"
+                
+
+                            document.getElementById("server").innerHTML = txt;
+                            wireEvents();
+                }
+                            };
+                            xmlhttp.open("GET", "http://10.0.1.200:1111/stats", true);
+                             xmlhttp.send();     
+            </script>
+            </div>
+            <!-- middle area not used yet -->
+            <div id="middle">
+         </div>
+         <!-- footer -->
+         <div id="footer"></div>
+      </div>
+      <!-- end container -->
+   </body>
+</html>
+
+<script type="text/javascript">
+    function wireEvents(){
+        for(var i=0;i< document.getElementsByClassName("btUp").length;i++)
+        {
+            document.getElementsByClassName("btUp")[i].onclick = function(){
+                enable(this.attributes["attr-server"].value);
+            };
+        }
+
+        for(var i=0;i< document.getElementsByClassName("btDown").length;i++)
+        {
+            document.getElementsByClassName("btDown")[i].onclick = function(){
+                disable(this.attributes["attr-server"].value);
+            };
+        }
+    }
+    // -- Enable button -- //
+    function enable(server){
+        var url = "http://10.0.1.200:1111/backend/be_app/server/" + server + status ;
+        var status = document.getElementsByName("status");
+        //alert("enable"+ server + "OK");
+        //Ajax call to enable server
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                alert("server says.."+ this.responseText);
+                location.reload(true);
+            for (var i = 0; i < status.length; i++)
+                status[i].setAttribute("disabled", false);
+        };
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(); 
+    }
+    }
+</script>
